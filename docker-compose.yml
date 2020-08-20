@@ -4,11 +4,15 @@ services:
     build: .
     ports:
       - 8000:8000
+    expose: 
+      - 8000
     volumes:
       - ./django_app:/app
     command: sh -c "python manage.py runserver 0.0.0.0:8000"
     depends_on:
       - db
+      - kafka
+      - rabbitmq
     
   db:
     image: postgres
@@ -19,3 +23,31 @@ services:
       - ./sql_data:/var/lib/postgresql/data:z
     environment:
       POSTGRES_PASSWORD: postgres
+
+  kafka:
+    image: 'wurstmeister/kafka'
+    ports:
+      - "9092:9092"
+    expose:
+      - "9092"
+    hostname: kafka
+    links: 
+      - zookeeper
+    environment:
+      - KAFKA_ADVERTISED_HOST_NAME=kafka
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_PORT=9092
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+      
+  rabbitmq:
+    image: 'rabbitmq'
+    environment:
+        - RABBITMQ_USERNAME=rabbitmq
+        - RABBITMQ_PASSWORD=rabbitmq
+    ports:
+        - '5672:5672'
+        - '15672:15672'

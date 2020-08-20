@@ -6,6 +6,10 @@ name = "pypi"
 [packages]
 django = "*"
 psycopg2-binary = "*"
+kafka-python = "*"
+celery = "*"
+flower = "*"
+sqlalchemy = "==1.0.14"
 
 [dev-packages]
 
