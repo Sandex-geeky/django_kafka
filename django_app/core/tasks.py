@@ -1,9 +1,11 @@
 import json
 from time import sleep
+
+from celery import shared_task
 from kafka import KafkaProducer
 
 
-
+@shared_task
 def calc_money(user_id, traffic_mb):
     COST_PER_MB = 0.05
     data = {

@@ -17,7 +17,7 @@ def api_log(request):
         data = json.loads(bin_data.decode('utf-8'))
         try:
             TrafficLog.objects.create(user_id=data.get('user_id'), traffic_mb=data.get('traffic_mb'))
-            calc_money(**data)
+            calc_money.delay(**data)
         except Exception as e:
             return HttpResponse(e)
         return JsonResponse(data, safe=False)
