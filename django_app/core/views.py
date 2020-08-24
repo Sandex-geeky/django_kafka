@@ -18,7 +18,7 @@ def api_log(request):
         data = json.loads(bin_data.decode('utf-8'))
         try:
             user = get_user_model().objects.get(id=data.get('user_id'))
-            TrafficLog.objects.create(user_id=user, traffic_mb=data.get('traffic_mb'))
+            TrafficLog.objects.create(user=user, traffic_mb=data.get('traffic_mb'))
             calc_money.delay(**data)
         except Exception as e:
             return HttpResponse(e)
