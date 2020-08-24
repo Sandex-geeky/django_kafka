@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
 from django.http import Http404
+from django.contrib.auth import get_user_model
 
 from core.models import TrafficLog
 from core.tasks import calc_money
@@ -16,7 +17,8 @@ def api_log(request):
         bin_data = request.body
         data = json.loads(bin_data.decode('utf-8'))
         try:
-            TrafficLog.objects.create(user_id=data.get('user_id'), traffic_mb=data.get('traffic_mb'))
+            user = get_user_model().objects.get(id=data.get('user_id'))
+            TrafficLog.objects.create(user_id=user, traffic_mb=data.get('traffic_mb'))
             calc_money.delay(**data)
         except Exception as e:
             return HttpResponse(e)

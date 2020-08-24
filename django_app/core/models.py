@@ -1,10 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 # Create your models here.
 
 class TrafficLog(models.Model):
-    user_id = models.IntegerField(verbose_name='user_id')
+    user_id = models.ForeignKey(get_user_model(), verbose_name='user_id', on_delete=models.CASCADE)
     traffic_mb = models.IntegerField(verbose_name='traffic', default=0)
     created_at = models.DateTimeField(
         verbose_name='Datetime', 
