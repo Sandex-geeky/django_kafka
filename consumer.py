@@ -1,10 +1,12 @@
 import json
+import os
 from kafka import KafkaConsumer
 from time import sleep
 
 consumer = KafkaConsumer(
     'topic_traffic_log',
-    bootstrap_servers=['localhost:9092'],
+    bootstrap_servers=['{0}:{1}'.format(os.getenv('KAFKA_HOST'),os.getenv('KAFKA_PORT'))],
+    # bootstrap_servers=['localhost:9092'],
     auto_offset_reset='earliest',
     enable_auto_commit=True,
     group_id='my-group-id',

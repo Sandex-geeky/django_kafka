@@ -13,14 +13,28 @@ services:
   #     - db
   #     - kafka
   #     - rabbitmq
+
+  celery:
+    build: .
+    volumes:
+      - ./django_app:/app
+    command: sh -c "celery -A web_app worker -l info"
+    environment: 
+      KAFKA_HOST: ${KAFKA_HOST}
+      KAFKA_PORT: ${KAFKA_PORT}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWD: ${RABBITMQ_PASSWD}
+    depends_on:
+      - rabbitmq
     
   db:
     image: postgres
     restart: always
     ports:
-      - 5432:5432
+      - ${PGPORT}:${PGPORT}
     volumes:
-      - ./sql_data:/var/lib/postgresql/data:z
+      - ./volumes/sql_data:/var/lib/postgresql/data:z
     environment:
       POSTGRES_DB: ${PGDB}
       POSTGRES_PASSWORD: ${PGPWD}
@@ -28,27 +42,26 @@ services:
   kafka:
     image: 'wurstmeister/kafka'
     ports:
-      - "9092:9092"
+      - ${KAFKA_PORT}:${KAFKA_PORT}
     expose:
-      - "9092"
-    hostname: kafka
+      - ${KAFKA_PORT}
+    hostname: ${KAFKA_HOST}
     links: 
       - zookeeper
     environment:
-      - KAFKA_ADVERTISED_HOST_NAME=kafka
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_ADVERTISED_PORT=9092
+      - KAFKA_ADVERTISED_HOST_NAME=${KAFKA_HOST}
+      - KAFKA_ZOOKEEPER_CONNECT=${ZOOKEEPER_HOST}:${ZOOKEEPER_PORT}
+      - KAFKA_ADVERTISED_PORT=${KAFKA_PORT}
 
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
-      - "2181:2181"
+      - ${ZOOKEEPER_PORT}:${ZOOKEEPER_PORT}
       
   rabbitmq:
     image: 'rabbitmq'
     environment:
-        - RABBITMQ_USERNAME=rabbitmq
-        - RABBITMQ_PASSWORD=rabbitmq
+        - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+        - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWD}
     ports:
-        - '5672:5672'
-        - '15672:15672'
+        - ${RABBITMQ_PORT}:${RABBITMQ_PORT}

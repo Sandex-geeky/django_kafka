@@ -9,7 +9,7 @@ import os
 
 # Celery settings
 
-CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
+CELERY_BROKER_URL = 'amqp://{0}:{1}@{2}'.format(os.getenv('RABBITMQ_USER'), os.getenv('RABBITMQ_PASSWD'), os.getenv('RABBITMQ_HOST'))
 
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
@@ -103,7 +103,7 @@ DATABASES = {
         'PASSWORD' : os.getenv('PGPWD'),
         'HOST' : '127.0.0.1',
         # 'HOST' : 'db',
-        'PORT' : '5432',
+        'PORT' : os.getenv('PGPORT'),
     }
 }
 
